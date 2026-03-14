@@ -1,0 +1,16 @@
+# SRΨ-Engine Tiny: 1D Burgers Equation Configuration
+# Viscous Burgers: ∂u/∂t + u·∂u/∂x = ν·∂²u/∂x²
+
+inherit: default.yaml
+
+task:
+  name: burgers_1d
+  nu: 0.01             # viscosity coefficient
+  domain_size: 2 * pi  # periodic domain [0, 2π]
+
+# Data generation settings
+data_gen:
+  ic_type: random      # initial condition type
+  amp_range: [0.5, 1.5]
+  freq_range: [1, 4]
+  bump_prob: 0.5       # probability of adding Gaussian bump

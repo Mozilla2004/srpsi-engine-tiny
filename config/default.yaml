@@ -1,0 +1,54 @@
+# SRΨ-Engine Tiny: Default Configuration
+# Target: Minimal reproducible experiments for field evolution prediction
+
+seed: 42
+device: cuda
+
+# Task definition
+task:
+  name: burgers_1d
+  nx: 128              # spatial resolution
+  tin: 16              # input time steps
+  tout: 32             # output/prediction time steps
+  dt: 0.01             # time step size
+  dx: 0.01             # spatial step size
+  samples_train: 4000
+  samples_val: 400
+  samples_test: 400
+  noise_std: 0.00      # input noise level
+
+# Training hyperparameters
+training:
+  batch_size: 32
+  epochs: 80
+  lr: 0.0001  # CHANGED: Lower learning rate for stability (was 0.0005)
+  weight_decay: 1.0e-5
+  grad_clip: 0.5  # CHANGED: Stricter gradient clipping (was 1.0)
+  teacher_forcing_ratio: 1.0
+  rollout_training_start_epoch: 20
+  rollout_training_ratio: 0.3
+
+# Loss weights
+loss:
+  lambda_cons: 0.1     # CHANGED: Reduced for stability (was 0.2)
+  lambda_phase: 0.0    # CHANGED: Disabled shift loss (was 0.1) - causing NaN
+  lambda_smooth: 0.02  # CHANGED: Reduced (was 0.05)
+
+# Model architecture
+model:
+  hidden_dim: 64
+  depth: 3             # number of SRΨ blocks
+  kernel_size: 5
+  dropout: 0.0
+
+# Evaluation settings
+eval:
+  perturb_shift: 4
+  perturb_noise_std: 0.01
+  rollout_steps: 32
+
+# Output settings
+output:
+  log_interval: 10
+  save_interval: 20
+  plot_interval: 20
