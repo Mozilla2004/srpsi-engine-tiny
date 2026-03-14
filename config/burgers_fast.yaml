@@ -1,0 +1,55 @@
+# SRΨ-Engine Tiny: Fast Training Configuration
+# Optimized for quick ablation study results
+
+inherit: default.yaml
+
+# Task definition (same as burgers.yaml)
+task:
+  name: burgers_1d
+  nu: 0.01
+  domain_size: 2 * pi
+
+# Data generation settings
+data_gen:
+  ic_type: random
+  amp_range: [0.5, 1.5]
+  freq_range: [1, 4]
+  bump_prob: 0.5
+
+# OPTIMIZED: Training hyperparameters
+training:
+  batch_size: 32
+  epochs: 40              # CHANGED: 40 instead of 80 for faster training
+  lr: 0.0001
+  weight_decay: 1.0e-5
+  grad_clip: 0.5
+  teacher_forcing_ratio: 1.0
+  rollout_training_start_epoch: 15   # CHANGED: Start rollout earlier (15 vs 20)
+  rollout_training_ratio: 0.3
+  early_stopping_patience: 10  # NEW: Stop if no improvement for 10 epochs
+  early_stopping_min_delta: 0.001  # NEW: Minimum improvement threshold
+
+# Loss weights (same as default)
+loss:
+  lambda_cons: 0.1
+  lambda_phase: 0.0
+  lambda_smooth: 0.02
+
+# Model architecture (same as default)
+model:
+  hidden_dim: 64
+  depth: 3
+  kernel_size: 5
+  dropout: 0.0
+
+# Evaluation settings (same as default)
+eval:
+  perturb_shift: 4
+  perturb_noise_std: 0.01
+  rollout_steps: 32
+
+# Output settings (more frequent logging for faster feedback)
+output:
+  log_interval: 5         # CHANGED: Log every 5 epochs (vs 10)
+  save_interval: 10       # CHANGED: Save every 10 epochs (vs 20)
+  plot_interval: 10
