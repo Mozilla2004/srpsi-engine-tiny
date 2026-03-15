@@ -71,7 +71,8 @@ for name, model_info in models.items():
             pred_end = gt_end - gt_start
 
             if gt_end > gt_start:
-                gt_chunk = u_true_short[:, gt_start:gt_end, :]
+                # Ground truth: [batch, tout, nx] -> transpose to [batch, nx, tout]
+                gt_chunk = u_true_short[:, gt_start:gt_end, :].transpose(1, 2)
                 pred_chunk = u_pred[:, pred_start:pred_end, :]
 
                 error = torch.mean((pred_chunk - gt_chunk) ** 2).item()
