@@ -35,7 +35,8 @@ __all__ = [
     'SRPsiEngineNoR',
     'ConvBaseline',
     'TransformerRelPE',
-    'get_model',  # Factory function
+    'get_model',  # Get model class
+    'create_model',  # Create model instance
 ]
 
 
@@ -75,3 +76,102 @@ def get_model(model_type: str):
         )
 
     return model_class
+
+
+def create_model(model_type: str, cfg: dict, device: torch.device):
+    """
+    Create model instance based on type and config.
+
+    Args:
+        model_type: String identifier for model type
+        cfg: Configuration dict (from load_config)
+        device: Target device (torch.device)
+
+    Returns:
+        model: Model instance (moved to device)
+
+    Raises:
+        ValueError: If model_type is not recognized
+    """
+    import torch.nn as nn
+
+    tin = cfg['task']['tin']
+    tout = cfg['task']['tout']
+    nx = cfg['task']['nx']
+    hidden_dim = cfg['model']['hidden_dim']
+    depth = cfg['model']['depth']
+    kernel_size = cfg['model']['kernel_size']
+
+    if model_type == 'conv_baseline':
+        model = ConvBaseline(
+            tin=tin,
+            nx=nx,
+            hidden_dim=hidden_dim,
+            depth=depth,
+            kernel_size=kernel_size,
+            tout=tout
+        )
+
+    elif model_type == 'transformer_rel_pe':
+        model = TransformerRelPE(
+            tin=tin,
+            nx=nx,
+            d_model=hidden_dim,
+            nhead=4,
+            num_layers=depth,
+            dropout=cfg['model']['dropout'],
+            tout=tout
+        )
+
+    elif model_type == 'srpsi_real':
+        model = SRPsiEngineReal(
+            tin=tin,
+            nx=nx,
+            hidden_dim=hidden_dim,
+            depth=depth,
+            kernel_size=kernel_size,
+            dt=0.01,
+            tout=tout
+        )
+
+    elif model_type == 'srpsi_no_r':
+        model = SRPsiEngineNoR(
+            tin=tin,
+            nx=nx,
+            hidden_dim=hidden_dim,
+            depth=depth,
+            kernel_size=kernel_size,
+            dt=0.01,
+            tout=tout
+        )
+
+    elif model_type == 'srpsi_tiny':
+        model = SRPsiEngineTiny(
+            tin=tin,
+            nx=nx,
+            hidden_dim=hidden_dim,
+            depth=depth,
+            kernel_size=kernel_size,
+            dt=0.01,
+            tout=tout
+        )
+
+    elif model_type == 'baseline_mlp':
+        model = BaselineMLP(tin, tout, nx, hidden_dim=hidden_dim)
+
+    elif model_type == 'baseline_transformer':
+        model = BaselineTransformer(
+            tin, tout, nx,
+            d_model=hidden_dim,
+            nhead=4,
+            num_layers=depth,
+            dropout=cfg['model']['dropout']
+        )
+
+    else:
+        raise ValueError(
+            f"Unknown model type: '{model_type}'. "
+            f"Available types: conv_baseline, transformer_rel_pe, srpsi_real, srpsi_no_r, srpsi_tiny"
+        )
+
+    return model.to(device)
