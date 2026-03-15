@@ -1,0 +1,187 @@
+# SRΨ-v2.0 Hybrid Model Configuration
+# =====================================
+#
+# Target: Combine SRΨ's spatial robustness (0.74x) with Transformer's temporal conservation (0.24x)
+# Challenge: Zero-shot extrapolation to T=500 (10x training length)
+#
+# Author: TRAE + Claude Code
+# Version: 2.0-Hybrid
+
+# Task Configuration
+task:
+  name: "burgers_v2_hybrid"
+  tin: 16           # Input time steps
+  tout: 32          # Output time steps (prediction)
+  nx: 128           # Spatial resolution
+  total_steps: 48   # Total training steps
+
+# Model Architecture
+model:
+  type: "srpsi_v2_hybrid"
+  name: "SRPsi-Hybrid-v2"
+
+  # Core dimensions
+  hidden_dim: 128   # Feature dimension (increased for v2)
+  depth: 4          # Number of hybrid blocks
+
+  # Spatial operator (SRΨ's S)
+  kernel_size: 5    # Structured spatial kernel
+  spatial_groups: 1 # Can use >1 for structured patterns
+
+  # Temporal operator (Transformer's Attention)
+  nhead: 4          # Number of attention heads
+  num_layers: 2     # Transformer layers per block
+  dropout: 0.1      # Dropout rate
+
+  # Output
+  tout: 32          # Prediction length
+
+# Loss Configuration (CRITICAL: Physical Constraints)
+loss:
+  type: "physical"
+
+  # Base fitting
+  mse_weight: 1.0
+
+  # Physical conservation constraints
+  lambda_energy: 0.1      # Energy conservation weight
+  lambda_momentum: 0.1    # Momentum conservation weight
+  lambda_noise: 0.05      # Noise robustness weight
+
+  # Adaptive warm-up
+  warmup_epochs: 10       # Gradually increase physical constraints
+
+  # Optional: Spectral loss (for later phases)
+  lambda_spectral: 0.0    # Will enable in Phase 3
+
+# Training Configuration
+training:
+  # Optimization
+  batch_size: 100
+  num_epochs: 80
+  learning_rate: 0.001
+  weight_decay: 1.0e-4
+
+  # Learning rate schedule
+  scheduler:
+    type: "cosine"
+    warmup_epochs: 5
+    min_lr: 1.0e-6
+
+  # Early stopping
+  patience: 15
+  min_delta: 1.0e-4
+
+# Validation Configuration
+validation:
+  val_interval: 5        # Validate every N epochs
+  val_samples: 100       # Number of validation samples
+
+  # Metrics
+  metrics:
+    - "mse"
+    - "energy_drift"
+    - "momentum_drift"
+    - "spectral_error"
+
+# Test Configuration (Physical Dimensions)
+test:
+  # Phase 1A: Physical dimension tests
+  physical_tests:
+    shift_robustness:
+      shifts: [0, 4, 16, 32, 64]
+      metric: "growth_rate"
+
+    energy_conservation:
+      rollout_steps: 100
+      metric: "energy_drift"
+
+    momentum_conservation:
+      rollout_steps: 100
+      metric: "momentum_drift"
+
+    noise_recovery:
+      noise_std: 0.15
+      metric: "recovery_rate"
+
+  # Phase 1C: Zero-shot extrapolation
+  extrapolation:
+    rollout_steps: 500   # 10x training length!
+    window_shift: 16
+    metric: "extrapolation_ratio"
+
+  # Phase 2: Spectral analysis
+  spectral:
+    target_slope: -5/3   # Kolmogorov spectrum
+    frequency_range: [1, 64]
+    metric: "spectral_distance"
+
+# Data Configuration
+data:
+  name: "burgers"
+  nu: 0.01             # Viscosity coefficient
+  num_samples: 4000    # Total samples
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+
+  # Data augmentation (optional)
+  augmentation:
+    enabled: false
+    shift_range: [0, 64]
+    noise_std: 0.0
+
+# Checkpoint Configuration
+checkpoint:
+  dir: "checkpoints/burgers_v2"
+  save_interval: 10
+  keep_last_n: 3
+
+  # Model to save
+  save_optimizer: true
+  save_scheduler: true
+
+# Logging Configuration
+logging:
+  dir: "logs/burgers_v2"
+  tensorboard: true
+  wandb: false
+
+  # Log interval
+  log_interval: 10     # Batches
+  log_images: true     # Log field visualizations
+
+# Hardware Configuration
+hardware:
+  device: "cuda"       # cuda, cpu, mps
+  num_workers: 4
+  pin_memory: true
+  mixed_precision: false  # Can enable for faster training
+
+# Reproducibility
+seed: 42
+deterministic: false
+benchmark: true
+
+# Experiment Metadata
+experiment:
+  name: "SRPsi-v2-Hybrid-Burgers"
+  description: "Hybrid architecture combining SRΨ's spatial robustness with Transformer's temporal conservation"
+  tags:
+    - "srpsi_v2"
+    - "hybrid"
+    - "physical_loss"
+    - "zero_shot_extrapolation"
+
+  # Goals
+  targets:
+    extrapolation_ratio: "< 0.3"   # Beat Transformer's 0.24x
+    shift_growth: "< 0.8"          # Beat SRΨ's 0.74x
+    energy_drift: "< 0.3"          # Beat Transformer's 0.24
+    momentum_drift: "< 2.0"        # Beat Transformer's 1.18
+
+  # Hypothesis
+  hypothesis: "Hybrid architecture will achieve:
+  1. Spatial robustness from SRΨ's S-operator (0.74x shift growth)
+  2. Temporal conservation from Transformer's attention (0.24x extrapolation)
+  3. Combined performance > individual components"
