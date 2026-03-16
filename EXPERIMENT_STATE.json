@@ -1,0 +1,197 @@
+{
+  "timestamp": "2026-03-16T08:46:00+08:00",
+  "project": "srpsi-engine-tiny",
+  "version": "v2.0-hybrid",
+
+  "experiment_phase": "physical_validation",
+  "phase_description": "物理外推能力验证 - 测试模型在真实数据和分布外参数上的表现",
+
+  "milestones": {
+    "milestone_1": {
+      "name": "Can Run",
+      "status": "completed",
+      "completion_date": "2026-03-13"
+    },
+    "milestone_2": {
+      "name": "Can Compare",
+      "status": "completed",
+      "completion_date": "2026-03-14"
+    },
+    "milestone_3": {
+      "name": "Can Explain",
+      "status": "in_progress",
+      "progress": 0.6
+    }
+  },
+
+  "models": {
+    "baseline_mlp": {
+      "status": "completed",
+      "performance": {
+        "rollout_mse": null,
+        "late_horizon_mse": null,
+        "energy_drift": null,
+        "shift_error": null
+      }
+    },
+    "baseline_transformer": {
+      "status": "completed",
+      "performance": {
+        "rollout_mse": 1.350302,
+        "late_horizon_mse": 1.608738,
+        "energy_drift": 13.991803,
+        "shift_error": 1.385022
+      },
+      "training_epochs": 80
+    },
+    "srpsi_engine_v1": {
+      "status": "completed",
+      "performance": {
+        "rollout_mse": 1.262785,
+        "late_horizon_mse": 1.581492,
+        "energy_drift": 10.883325,
+        "shift_error": 0.023424
+      },
+      "training_epochs": 80,
+      "advantages": {
+        "vs_transformer": {
+          "rollout_mse": "-6.5%",
+          "late_horizon_mse": "-1.7%",
+          "energy_drift": "-22.2%",
+          "shift_error": "-98.3%"
+        }
+      }
+    },
+    "srpsi_v2_hybrid": {
+      "status": "in_development",
+      "description": "SRΨ + Attention 混合架构",
+      "key_features": [
+        "S-Operator: 空间结构化提取",
+        "Attention: 时间长程关联",
+        "DomainInteractionGate: 动态融合"
+      ],
+      "testing_status": "running_physical_tests"
+    }
+  },
+
+  "datasets": {
+    "synthetic": {
+      "name": "Burgers 1D",
+      "samples": 4800,
+      "train": 4000,
+      "val": 400,
+      "test": 400,
+      "nx": 128,
+      "tin": 16,
+      "tout": 32,
+      "status": "ready"
+    },
+    "real": {
+      "status": "preparing",
+      "description": "真实物理场数据",
+      "location": "real_data/",
+      "preparation_script": "prepare_real_data_local.py"
+    }
+  },
+
+  "key_findings": {
+    "hypothesis_1": {
+      "name": "Long-term Stability",
+      "status": "verified",
+      "evidence": "Late Horizon MSE ↓ 1.7%"
+    },
+    "hypothesis_2": {
+      "name": "Conservation Control",
+      "status": "verified",
+      "evidence": "Energy Drift ↓ 22.2%"
+    },
+    "hypothesis_3": {
+      "name": "Shift Robustness",
+      "status": "strongly_verified",
+      "evidence": "Shift Error ↓ 98.3%"
+    },
+    "hypothesis_4": {
+      "name": "Disturbance Recovery",
+      "status": "testing",
+      "evidence": "pending"
+    }
+  },
+
+  "trae_insights": {
+    "paradigm_shift": "从'数据拟合'到'物理重构'",
+    "core_principle": "智能即物理学,智能体现在不变性而非拟合度",
+    "warning": "Loss 越低,有时反而意味着模型被锁死在特定坐标系中",
+    "key_metrics": [
+      "Shift Robustness",
+      "Energy Drift",
+      "Field-State Coherence"
+    ],
+    "philosophy": "SRΨ 略高的 Loss 是为维持物理不变性付出的代价"
+  },
+
+  "architecture_evolution": {
+    "v1.0": "纯 SRΨ (Complex-valued + S/R/N/Φ)",
+    "v2.0": "Hybrid (SRΨ + Attention)",
+    "v2.0_features": {
+      "spatial": "S-Operator 结构化提取",
+      "temporal": "Attention 长程关联",
+      "fusion": "DomainInteractionGate 动态融合"
+    }
+  },
+
+  "current_tasks": [
+    {
+      "task": "Physical Tests v2.0",
+      "status": "in_progress",
+      "files": [
+        "test_v2_physical.py",
+        "test_v2_extrapolation.py",
+        "prepare_real_data_local.py"
+      ],
+      "goals": [
+        "真实数据测试",
+        "外推比例 < 0.24x",
+        "物理一致性验证"
+      ]
+    },
+    {
+      "task": "撰写 v2.0 实验报告",
+      "status": "pending",
+      "content": [
+        "Hybrid 架构性能",
+        "物理外推分析",
+        "与 v1.0 对比"
+      ]
+    },
+    {
+      "task": "准备开源发布",
+      "status": "pending",
+      "checklist": [
+        "代码整理",
+        "文档完善",
+        "示例脚本",
+        "README 更新"
+      ]
+    }
+  ],
+
+  "next_actions": [
+    "完成 Physical Tests v2.0 的真实数据测试",
+    "验证 Extrapolation Ratio < 0.24x",
+    "对比 v1.0 vs v2.0 性能",
+    "撰写 v2.0 实验报告"
+  ],
+
+  "metadata": {
+    "schema_version": "0.1",
+    "project_type": "scientific_experiment",
+    "domain": "physics_informed_ml",
+    "tasks": [
+      "field_evolution_prediction",
+      "burgers_equation",
+      "physical_conservation"
+    ],
+    "contact": "Genesis-OS Research Team",
+    "repository": "srpsi-engine-tiny"
+  }
+}
