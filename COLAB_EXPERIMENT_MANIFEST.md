@@ -239,6 +239,7 @@
 2. **TRAE_INSIGHTS.md** - 完整阅读
 3. **train_v2_hybrid.py** - 重点关注 get_field_reading()
 4. **src/training/physical_loss.py** - 重点关注 get_coupling_weights()
+5. **src/datasets.py** - 数据加载器（注意：是 src.datasets，不是 src.data.data_loader）
 
 ### 核心理解:
 - **Phase-Aware Training**: 每个 epoch 读取场状态
