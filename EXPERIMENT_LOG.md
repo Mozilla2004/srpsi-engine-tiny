@@ -9,8 +9,8 @@
 
 ## 统计信息
 
-- **总条目数**: 10
-- **当前阶段**: dynamic_field_aware_training
+- **总条目数**: 11
+- **当前阶段**: colab_experiment_ready
 - **关键里程碑**: ✅ Milestone 1 | ✅ Milestone 2 | 🔄 Milestone 3
 
 ---
@@ -292,6 +292,69 @@
 **状态**: ✅ 动态场状态感知实现完成
 
 **技术意义**: Loss 函数从"静态约束"进化到"动态感知"
+
+---
+
+## Entry 0011
+
+- **timestamp**: 2026-03-16T20:30:00+08:00
+- **speaker**: claudecode
+- **type**: experiment_preparation
+- **phase**: colab_experiment_ready
+- **summary**: 📋 Colab 实验方案完成:安静但清醒的算力节点
+- **details**: |
+  **创建文件**:
+  - COLAB_EXPERIMENT_MANIFEST.md (完整实验清单)
+  - SRPSI_v2_Field_Aware_Training_Colab.ipynb (Colab Notebook)
+
+  **实验定位**: 安静但清醒的算力节点
+  - 不是"盲跑脚本",而是有基本上下文感知
+  - 每一个 epoch 都在场状态感知下运行
+  - 每一个权重都在动态调整
+
+  **实验目标**:
+  1. 验证动态权重机制能够正常工作
+  2. 观察 Resonance 如何随训练变化
+  3. 验证 Energy Drift 是否优于 v1.0 (目标 < 10.0)
+  4. 观察策略切换:从"拟合优先"到"物理优先"
+
+  **成功判据**:
+  - 最小: 训练完成 80 epochs, Resonance 正确计算
+  - 预期: Resonance > 0.7, Energy Drift < 10.0, Phase = 'stable'
+  - 理想: Resonance > 0.85, Energy Drift < 9.0, 清晰的策略切换
+
+  **关键观察指标**:
+  - Resonance 曲线: 0.5 → >0.7
+  - Phase 转换: evolving → stable
+  - 动态权重: fitting_weight 和 consistency_scale 的自适应
+  - 物理守恒: Energy/Momentum Drift
+
+  **实验流程** (总时长 ~90-120 分钟):
+  1. 环境准备 (5 min)
+  2. 数据准备 (5 min)
+  3. 模型训练 (60-90 min)
+  4. 结果分析 (10 min)
+
+  **输出要求**:
+  - 训练日志: 每个 epoch 的完整指标
+  - Resonance 曲线: 如何随训练变化
+  - 动态权重曲线: 自适应过程可视化
+  - 物理守恒指标: 最终性能
+  - Checkpoints: 最佳和最终模型
+
+  **设计理念**:
+  - 简洁但完整
+  - 安静但不盲目
+  - 有上下文但不复杂
+  - 可执行但可观察
+
+**文件**:
+- COLAB_EXPERIMENT_MANIFEST.md
+- SRPSI_v2_Field_Aware_Training_Colab.ipynb
+
+**状态**: ✅ 实验方案就绪
+
+**下一步**: 在 Colab 中运行 Notebook
 
 ---
 
