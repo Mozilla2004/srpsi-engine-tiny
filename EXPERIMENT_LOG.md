@@ -9,8 +9,8 @@
 
 ## 统计信息
 
-- **总条目数**: 9
-- **当前阶段**: field_aware_training
+- **总条目数**: 10
+- **当前阶段**: dynamic_field_aware_training
 - **关键里程碑**: ✅ Milestone 1 | ✅ Milestone 2 | 🔄 Milestone 3
 
 ---
@@ -245,6 +245,53 @@
 **状态**: ✅ 场自治架构实现
 
 **影响**: 开启"场状态感知训练"新范式
+
+---
+
+## Entry 0010
+
+- **timestamp**: 2026-03-16T18:00:00+08:00
+- **speaker**: trae
+- **type**: implementation_refinement
+- **phase**: dynamic_field_aware_training
+- **summary**: ⚡ 场状态感知训练 v2.0:动态权重自适应实现
+- **details**: |
+  **核心突破**: IntegratedConstraint 真正实现了场状态感知
+
+  **动态权重机制** (physical_loss.py:40-50):
+  ```python
+  def get_coupling_weights(self, field_state: dict):
+      resonance = field_state.get('resonance', 0.5)
+
+      # Resonance 高 → 更强调物理一致性
+      # Resonance 低 → 更强调数据拟合
+      fitting_weight = 1.0 - (resonance * 0.5)
+      consistency_scale = 1.0 + resonance
+  ```
+
+  **关键洞察**:
+  - Loss 函数不再是静态权重,而是根据场状态**动态调整**
+  - Resonance 从 0.5 → 1.0:
+    - fitting_weight: 0.75 → 0.5 (减少拟合权重)
+    - consistency_scale: 1.5 → 2.0 (增强物理约束)
+  - 这是真正的"场驱动优化",而非"固定约束优化"
+
+  **训练循环完全集成** (train_v2_hybrid.py):
+  - 每个 epoch 读取场状态
+  - 将 field_state 传递到 train_epoch, validate, loss 函数
+  - Loss 函数根据 resonance 动态调整优化方向
+
+  **数据加载改进**:
+  - 改用字典格式: `batch['x']`, `batch['y']`
+  - 更清晰的结构化数据表示
+
+**文件**:
+- src/training/physical_loss.py (动态权重核心)
+- train_v2_hybrid.py (训练循环集成)
+
+**状态**: ✅ 动态场状态感知实现完成
+
+**技术意义**: Loss 函数从"静态约束"进化到"动态感知"
 
 ---
 
